@@ -14,24 +14,6 @@ class ApiResponse {
       this.error = Constants.ENV === 'development' ? error : null;
       this.errorType = Constants.ENV === 'development' ? errorType : null;
     }
-
-    // Log the response details to the console
-    // DEVELOPMENT ONLY
-    if (Constants.ENV === 'development') {
-      console.log("[API RESPONSE START]");
-      console.log(`[API RESPONSE] ${this.success ? 'SUCCESS' : 'FAILURE'}`);
-      console.log(`[API RESPONSE] STATUS: ${this.status}`);
-      console.log(`[API RESPONSE] MESSAGE: ${this.message}`);
-      console.log("[API RESPONSE] DATA:-");
-      console.dir(this.data);
-      if(!this.success) {
-        console.log("[API RESPONSE] ERROR:-");
-        console.dir(this.error);
-        console.log(`[API RESPONSE] ERROR TYPE: ${this.errorType}`);
-      }
-      console.log(`[API RESPONSE] TIMESTAMP: ${new Date().toISOString()}`);
-      console.log("[API RESPONSE END]");
-    }
   }
 }
 
@@ -61,9 +43,21 @@ const successResponseWithCookies = (res, data, message, cookies) => {
   }
 }
 
+
+/** successResponseWithClearCookie(res, data, message) => void */
+const successResponseWithClearCookie = (res, data, message) => {
+  const options = { httpOnly: true, secure: true, sameSite: "strict" };
+
+  res
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .status(200)
+    .json(new ApiResponse(200, message, data));
+}
+
 /** errorResponse(res, status, message, errorType, error) => void */
 const errorResponse = (res, status, message, errorType, error) => {
   res.status(status).json(new ApiResponse(status, message, null, errorType, error));
 }
 
-export { successResponse, errorResponse, successResponseWithCookies };
+export { successResponse, errorResponse, successResponseWithCookies, successResponseWithClearCookie };

@@ -1,15 +1,66 @@
 // API error helper functions
-import { errorResponse } from './ApiResponse.js';
+class ApiError extends Error {
+  constructor(message, errorType = 'UNSPECIFIED', status = 500, errors = null) {
+    super(message);
+    this.message = message;
+    this.errorType = errorType;
+    this.status = status;
+    this.errors = errors;
+  }
 
-const badRequest = (message, error) => errorResponse(400, message, error);
-const validationError = (message, error) => errorResponse(400, message, error);
-const semanticError = (message, error) => errorResponse(422, message, error);
-const unauthorized = (message, error) => errorResponse(401, message, error);
-const forbidden = (message, error) => errorResponse(403, message, error);
-const notFound = (message, error) => errorResponse(404, message, error);
-const conflict = (message, error) => errorResponse(409, message, error);
-const internalServerError = (message, error) => errorResponse(500, message, error);
-const unsupportedMediaType = (message, error) => errorResponse(415, message, error);
+  toJSON() {
+    return {
+      message: this.message,
+      errorType: this.errorType,
+      status: this.status,
+      errors: this.errors,
+    };
+  }
+
+  toString() {
+    return JSON.stringify(this.toJSON());
+  }
+
+  log() {
+    
+  }
+}
+
+const badRequest = (message, errors) => {
+  throw new ApiError(message, "BAD_REQUEST", 400, errors);
+};
+
+const validationError = (message, errors) => {
+  throw new ApiError(message, "VALIDATION_ERROR", 400, errors);
+};
+
+const semanticError = (message, errors) => {
+  throw new ApiError(message, "SEMANTIC_ERROR", 422, errors);
+};
+
+const unauthorized = (message, errors) => {
+  throw new ApiError(message, "UNAUTHORIZED", 401, errors);
+};
+
+const forbidden = (message, errors) => {
+  throw new ApiError(message, "FORBIDDEN", 403, errors);
+};
+
+const notFound = (message, errors) => {
+  throw new ApiError(message, "NOT_FOUND", 404, errors);
+};
+
+const conflict = (message, errors) => {
+  throw new ApiError(message, "CONFLICT", 409, errors);
+};
+
+const internalServerError = (message, errors) => {
+  throw new ApiError(message, "INTERNAL_SERVER_ERROR", 500, errors);
+};
+
+const unsupportedMediaType = (message, errors) => {
+  throw new ApiError(message, "UNSUPPORTED_MEDIA_TYPE", 415, errors);
+};
 
 export {
   badRequest,
