@@ -6,6 +6,7 @@ import express from 'express';
 import connectToDatabase from './database/connectToDatabase.js';
 import CONSTANTS from './constants.js';
 import { publicRouter } from './routes/routes.js';
+import { requestLogger } from './helpers/logging.js';
 
 connectToDatabase();
 const PORT = CONSTANTS.PORT;
@@ -17,6 +18,7 @@ const middlewares = [
   express.urlencoded({ extended: true }),
   cookieParser(),
   compression(),
+  requestLoggerMiddleware,
   publicRouter,
 ];
 app.use(middlewares);
@@ -31,3 +33,9 @@ process.on('unhandledRejection', (reason, promise) => {
   console.log("⚠️ Unhandled Rejection at:\n", promise, "reason:\n", reason);
   process.exit(1);
 });
+
+// request logger middleware
+const requestLoggerMiddleware = (req, _res, next) => {
+  requestLogger(req);
+  next();
+};

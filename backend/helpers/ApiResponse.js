@@ -1,5 +1,6 @@
 // standardized API response format
 import Constants from "../constants.js";
+import { responseLogger } from "../helpers/logging.js";
 
 class ApiResponse {
   constructor(status, message, data = null, errorType = 'UNSPECIFIED', error = null) {
@@ -14,6 +15,8 @@ class ApiResponse {
       this.error = Constants.ENV === 'development' ? error : null;
       this.errorType = Constants.ENV === 'development' ? errorType : null;
     }
+
+    responseLogger(this);
   }
 }
 

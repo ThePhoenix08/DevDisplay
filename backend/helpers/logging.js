@@ -1,4 +1,5 @@
 import Constants from "../constants.js";
+import { internalServerError } from "./ApiError.js";
 
 const consoleTextColoringWrapperData = {
   blue: {
@@ -71,6 +72,11 @@ const infoLogger = (tag, message) => {
 }
 
 const responseLogger = (responseObject) => {
+  const isResponseObject = (responseObject instanceof ApiResponse);
+  if(!isResponseObject) {
+    internalServerError("Response object is not an instance of ApiResponse", null);
+  };
+
   const { success, message, data, status, errorType, error } = responseObject;
 
   if(Constants.ENV === 'development') {
