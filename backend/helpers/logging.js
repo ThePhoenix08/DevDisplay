@@ -99,11 +99,11 @@ const requestLogger = (req) => {
   const {  method, url, hostname } = req;
 
   if(Constants.ENV === 'development') {
-    console.log(`${consoleTextColoringWrapper("blue", "------[ API REQUEST ]------")}`);
-    console.log(`${consoleBgColoringWrapper("white", "METHOD")}: ${consoleTextColoringWrapper("magenta", method)}`);
-    console.log(`${consoleBgColoringWrapper("white", "URL")}: ${consoleTextColoringWrapper("green", url)}`);
-    console.log(`${consoleBgColoringWrapper("white", "HOSTNAME")}: ${consoleTextColoringWrapper("blue", hostname)}`);
-    console.log(`${consoleTextColoringWrapper("blue", "---+---[ API REQUEST END ]---+---")}`);
+    console.log(`\n${consoleTextColoringWrapper("blue", "------[ API REQUEST ]------")}`);
+    console.log(`${consoleTextColoringWrapper("cyan", "METHOD")}: ${consoleTextColoringWrapper("magenta", method)}`);
+    console.log(`${consoleTextColoringWrapper("cyan", "URL")}: ${consoleTextColoringWrapper("green", url)}`);
+    console.log(`${consoleTextColoringWrapper("cyan", "HOSTNAME")}: ${consoleTextColoringWrapper("blue", hostname)}`);
+    console.log(`${consoleTextColoringWrapper("blue", "---+---[ API REQUEST END ]---+---")}\n`);
   }
 }
 

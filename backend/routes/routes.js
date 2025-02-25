@@ -3,11 +3,11 @@ import { loginUser, logoutUser, registerUser } from '../controllers/auth.control
 import authenticate from '../middlewares/auth.middleware.js';
 
 const publicRouter = Router();
-publicRouter.get("/", (req, res) => {
+publicRouter.get("/", (_req, res) => {
   res.status(200).send("API is running.\nCheck /health for more info.");
 });
 
-publicRouter.get("/health", (req, res) => {
+publicRouter.get("/healthCheck", (req, res) => {
   const health = {
     status: "OK",
     message: "API is running",

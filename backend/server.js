@@ -26,7 +26,7 @@ const middlewares = [
   compression(),
   requestLoggerMiddleware,
   publicRouter,
-  protectedRouter,
+  // protectedRouter,
 ];
 app.use(middlewares);
 
