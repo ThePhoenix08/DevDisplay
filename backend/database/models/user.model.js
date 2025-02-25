@@ -56,7 +56,6 @@ const UserSchema = new Schema({
   },
   refreshToken: {
     type: String,
-    required: true,
   },
   role: {
     type: String,

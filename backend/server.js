@@ -1,10 +1,10 @@
+import Constants from './constants.js';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 
 import connectToDatabase from './database/connectToDatabase.js';
-import CONSTANTS from './constants.js';
 import { requestLogger } from './helpers/logging.js';
 import { protectedRouter, publicRouter } from './routes/routes.js';
 
@@ -15,12 +15,12 @@ const requestLoggerMiddleware = (req, _res, next) => {
 };
 
 connectToDatabase();
-const PORT = CONSTANTS.PORT;
+const PORT = Constants.PORT;
 
 const app = express();
 const middlewares = [
-  cors({credentials: true, origin: CONSTANTS.ORIGIN_URL}),
-  express.json({ limit: CONSTANTS.JSON_LIMIT }),
+  cors({credentials: true, origin: Constants.ORIGIN_URL}),
+  express.json({ limit: Constants.JSON_LIMIT }),
   express.urlencoded({ extended: true }),
   cookieParser(),
   compression(),
@@ -31,7 +31,7 @@ const middlewares = [
 app.use(middlewares);
 
 app.listen(PORT, () => {
-  const msg = CONSTANTS.ENV === 'production' ? 'in production' : `in development on port: ${PORT}`;
+  const msg = Constants.ENV === 'production' ? 'in production' : `in development on port: ${PORT}`;
   console.log(`✅ Server is running ${msg}`);
 });
 

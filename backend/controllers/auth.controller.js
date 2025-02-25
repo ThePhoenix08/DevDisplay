@@ -20,19 +20,15 @@ export const registerUser = asyncHandler(async (req, res) => {
   validateRequest(req);
 
   // validate request format
-  const data = validate(res, req.body, signUpSchema, "Invalid or Insufficient Information for Sign Up.");
+  const data = validate(req.body, signUpSchema, "Invalid or Insufficient Information for Sign Up.");
   const { username, email, password, fullname } = data;
 
   // check if user exists
-  const existingUser = checkIfUserExists(req, username, email, false);
+  const existingUser = await checkIfUserExists(username, email, false);
   if (existingUser !== null) conflict("User already exists.");
 
   // hashing password
   const passwordHash = await hashUserPassword(password);
-
-  // generate access token, refresh token
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
 
   // creating user object
   const user = new UserModel({
@@ -41,15 +37,23 @@ export const registerUser = asyncHandler(async (req, res) => {
     password,
     fullname,
     passwordHash,
-    refreshToken
+    role: "pioneer",
   });
+  await user.save();
 
   // recheck if user created successfully
-  const createdUser = checkIfUserExists(username, email, false);
+  const createdUser = await checkIfUserExists(username, email, false);
   if (!createdUser) internalServerError("Failed to create user.");
 
+  // generate access token, refresh token
+  const accessToken = generateAccessToken(createdUser._id);
+  const refreshToken = generateRefreshToken(createdUser._id);
+
+  // add refresh token to user
+  const updatedUser = await updateRefreshTokenOfUser(createdUser._id, refreshToken);
+
   // omit refresh token and password hash from cookies
-  const newUser = omitPasswordHashAndRefreshToken(createdUser);
+  const newUser = omitPasswordHashAndRefreshToken(updatedUser);
 
   // return success response with user and cookies
   successResponseWithCookies(res, { user: newUser }, "User registered successfully.", {

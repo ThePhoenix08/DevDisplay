@@ -2,7 +2,7 @@
 import Constants from "../constants.js";
 import { responseLogger } from "../helpers/logging.js";
 
-class ApiResponse {
+export class ApiResponse {
   constructor(status, message, data = null, errorType = 'UNSPECIFIED', error = null) {
     this.success = status < 300 ? true : false; // Boolean value indicating whether the request was successful or not
     this.message = message, // Brief description of the result
@@ -31,17 +31,22 @@ const successResponseWithCookies = (res, data, message, cookies) => {
   const options = { httpOnly: true, secure: true, sameSite: "strict" };
 
   if(cookies) {
-    if(cookies.accessToken) {
+    if(cookies.accessToken && cookies.refreshToken) {
       res
-      .status(200)
-      .cookie("accessToken", cookies.accessToken, options)
-      .json(new ApiResponse(200, message, data));
-    }
-    if(cookies.refreshToken) {
+        .status(200)
+        .cookie("accessToken", cookies.accessToken, options)
+        .cookie("refreshToken", cookies.refreshToken, options)
+        .json(new ApiResponse(200, message, data));
+    } else if(cookies.accessToken) {
       res
-      .status(200)
-      .cookie("refreshToken", cookies.refreshToken, options)
-      .json(new ApiResponse(200, message, data));
+        .status(200)
+        .cookie("accessToken", cookies.accessToken, options)
+        .json(new ApiResponse(200, message, data));
+    } else if(cookies.refreshToken) {
+      res
+        .status(200)
+        .cookie("refreshToken", cookies.refreshToken, options)
+        .json(new ApiResponse(200, message, data));
     }
   }
 }

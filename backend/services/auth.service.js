@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 import Constants from '../constants.js';
-import User from '../database/models/user.model.js';
 import { notFound, unauthorized, internalServerError, badRequest } from '../helpers/ApiError.js';
+import UserModel from '../database/models/user.model.js';
 
 /* services for auth */
 
@@ -17,7 +17,7 @@ const omitPasswordHashAndRefreshToken = (user) => {
 /** async checkIfUserExists(res, username, email, throwError = true): lean(User) | null */
 const checkIfUserExists = async (username, email, throwError = true) => {
   try {
-    const user = await User.findOne({ $or: [{ username }, { email }] }).lean();
+    const user = await UserModel.findOne({ $or: [{ username }, { email }] }).lean();
     if (!user) {
       if (throwError) {
         notFound('User not found');
@@ -86,7 +86,7 @@ const validateRefreshToken = async (refreshToken) => {
     }
 
     // check if user id is valid
-    const user = await User.findById(userId).lean();
+    const user = await UserModel.findById(userId).lean();
     if(!user) {
       console.log("REFRESH_TOKEN_ERROR: User not found, userID is invalid");
       throw unauthorized('Refresh token is invalid or has expired');
@@ -149,14 +149,15 @@ const hashUserPassword = async (password) => {
 /** updateRefreshTokenOfUser(userId, newRefreshToken) => lean(updatedUser) | throw(error) */
 const updateRefreshTokenOfUser = async (userId, newRefreshToken, unset = false) => {
   try {
-    const user = await User.findById(userId).lean();
+    const user = await UserModel.findById(userId).lean();
     if (!user) {
       notFound('User not found');
       return;
     }
+    let updatedUser;
 
     if(unset) {
-      const updatedUser = await User.findByIdAndUpdate(
+      updatedUser = await UserModel.findByIdAndUpdate(
         userId,
         { $unset: { refreshToken: 1 } },
       ).lean();
@@ -164,7 +165,7 @@ const updateRefreshTokenOfUser = async (userId, newRefreshToken, unset = false) 
         internalServerError('Failed to Update the users credentials in database');
       }
     } else  {
-      const updatedUser = await User.findByIdAndUpdate(
+      updatedUser = await UserModel.findByIdAndUpdate(
         userId,
         {...user, refreshToken: newRefreshToken},
       ).lean();
@@ -175,7 +176,7 @@ const updateRefreshTokenOfUser = async (userId, newRefreshToken, unset = false) 
 
     return updatedUser;
   } catch (error) {
-    internalServerError('Failed to check if user exists');
+    internalServerError(error.message, error);
   }
 }
 

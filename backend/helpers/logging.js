@@ -1,5 +1,6 @@
 import Constants from "../constants.js";
 import { internalServerError } from "./ApiError.js";
+import { ApiResponse } from "./ApiResponse.js";
 
 const consoleTextColoringWrapperData = {
   blue: {
