@@ -15,41 +15,41 @@ const omitPasswordHashAndRefreshToken = (user) => {
 
 // check if user exists
 /** async checkIfUserExists(res, username, email, throwError = true): lean(User) | null */
-const checkIfUserExists = async (res, username, email, throwError = true) => {
+const checkIfUserExists = async (username, email, throwError = true) => {
   try {
     const user = await User.findOne({ $or: [{ username }, { email }] }).lean();
     if (!user) {
       if (throwError) {
-        notFound(res, 'User not found');
+        notFound('User not found');
       }
       return null;
     }
     return user;
   } catch (error) {
-    internalServerError(res, 'Failed to check if user exists');
+    internalServerError('Failed to check if user exists');
   }
 };
 
 // check if password is correct
 /** async checkIfPasswordIsCorrect(res, user, passwordToVerify, throwError = true): void */
-const checkIfPasswordIsCorrect = async (res, storedPasswordHash, passwordToVerify, throwError = true) => {
+const checkIfPasswordIsCorrect = async (storedPasswordHash, passwordToVerify, throwError = true) => {
   try {
     const isPasswordCorrect = await bcrypt.compare(passwordToVerify, storedPasswordHash);
     if (!isPasswordCorrect) {
       if (throwError) {
-        unauthorized(res, 'Incorrect password');
+        unauthorized('Incorrect password');
       }
       return false;
     }
     return true;
   } catch (error) {
-    internalServerError(res, 'Failed to check if password is correct');
+    internalServerError('Failed to check if password is correct');
   }
 }
 
 // validate refresh token
 /** async validateRefreshToken(res, refreshToken): User | Error */
-const validateRefreshToken = async (res, refreshToken) => {
+const validateRefreshToken = async (refreshToken) => {
   try {
     // checks summary:
     // 1. refresh token is signed using the correct secret
@@ -63,44 +63,44 @@ const validateRefreshToken = async (res, refreshToken) => {
     const decoded = jwt.verify(refreshToken, Constants.REFRESH_TOKEN_SECRET);
     if(!decoded) {
       console.log("REFRESH_TOKEN_ERROR: Undefined");
-      unauthorized(res, 'Refresh token is invalid or has expired');
+      unauthorized('Refresh token is invalid or has expired');
     }
 
     // validate refresh token format
     const { iss: issuer, sub: userId, iat: issuedAt, purpose } = decoded;
     if(!userId || !issuedAt || !purpose) {
       console.log("REFRESH_TOKEN_ERROR: Wrong format");
-      throw badRequest(res, 'Refresh token is invalid or has expired');
+      throw badRequest('Refresh token is invalid or has expired');
     }
 
     // check if refresh token is issued by the correct origin
     if(issuer !== Constants.ORIGIN_URL) {
       console.log("REFRESH_TOKEN_ERROR: Origin mismatch");
-      throw unauthorized(res, 'Refresh token is invalid or has expired');
+      throw unauthorized('Refresh token is invalid or has expired');
     }
 
     // check if refresh token has expired
     if(issuedAt + Constants.REFRESH_TOKEN_MAXAGE < Date.now()) {
       console.log("REFRESH_TOKEN_ERROR: Expired");
-      throw unauthorized(res, 'Refresh token is invalid or has expired');
+      throw unauthorized('Refresh token is invalid or has expired');
     }
 
     // check if user id is valid
     const user = await User.findById(userId).lean();
     if(!user) {
       console.log("REFRESH_TOKEN_ERROR: User not found, userID is invalid");
-      throw unauthorized(res, 'Refresh token is invalid or has expired');
+      throw unauthorized('Refresh token is invalid or has expired');
     }
 
     // check if refresh token matches the user's refresh token
     if(user.refreshToken !== refreshToken) {
       console.log("REFRESH_TOKEN_ERROR: Refresh token does not match");
-      throw unauthorized(res, 'Refresh token is invalid or has expired');
+      throw unauthorized('Refresh token is invalid or has expired');
     }
 
     return user;
   } catch (error) {
-    throw internalServerError(res, 'Failed to validate refresh token');
+    throw internalServerError('Failed to validate refresh token');
   }
 }
 
@@ -147,11 +147,11 @@ const hashUserPassword = async (password) => {
 
 // updates refresh token in user doc
 /** updateRefreshTokenOfUser(userId, newRefreshToken) => lean(updatedUser) | throw(error) */
-const updateRefreshTokenOfUser = async (res, userId, newRefreshToken, unset = false) => {
+const updateRefreshTokenOfUser = async (userId, newRefreshToken, unset = false) => {
   try {
     const user = await User.findById(userId).lean();
     if (!user) {
-      notFound(res, 'User not found');
+      notFound('User not found');
       return;
     }
 
@@ -161,7 +161,7 @@ const updateRefreshTokenOfUser = async (res, userId, newRefreshToken, unset = fa
         { $unset: { refreshToken: 1 } },
       ).lean();
       if(!updatedUser) {
-        internalServerError(res, 'Failed to Update the users credentials in database');
+        internalServerError('Failed to Update the users credentials in database');
       }
     } else  {
       const updatedUser = await User.findByIdAndUpdate(
@@ -169,13 +169,13 @@ const updateRefreshTokenOfUser = async (res, userId, newRefreshToken, unset = fa
         {...user, refreshToken: newRefreshToken},
       ).lean();
       if(!updatedUser) {
-        internalServerError(res, 'Failed to Update the users credentials in database');
+        internalServerError('Failed to Update the users credentials in database');
       }
     }
 
     return updatedUser;
   } catch (error) {
-    internalServerError(res, 'Failed to check if user exists');
+    internalServerError('Failed to check if user exists');
   }
 }
 

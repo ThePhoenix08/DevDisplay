@@ -25,7 +25,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   // check if user exists
   const existingUser = checkIfUserExists(req, username, email, false);
-  if (existingUser !== null) conflict(res, "User already exists.");
+  if (existingUser !== null) conflict("User already exists.");
 
   // hashing password
   const passwordHash = await hashUserPassword(password);
@@ -45,8 +45,8 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   // recheck if user created successfully
-  const createdUser = checkIfUserExists(res, username, email, false);
-  if (!createdUser) internalServerError(res, "Failed to create user.");
+  const createdUser = checkIfUserExists(username, email, false);
+  if (!createdUser) internalServerError("Failed to create user.");
 
   // omit refresh token and password hash from cookies
   const newUser = omitPasswordHashAndRefreshToken(createdUser);
@@ -73,21 +73,21 @@ export const loginUser = asyncHandler(async (req, res) => {
   validateRequest(req);
 
   // validate request format
-  const data = validate(res, req.body, loginSchema, "Invalid or Insufficient Information for Log In.");
+  const data = validate(req.body, loginSchema, "Invalid or Insufficient Information for Log In.");
   const { username, email, password } = data;
 
   // check if user exists
-  const existingUser = checkIfUserExists(res, username, email);
+  const existingUser = checkIfUserExists(username, email);
 
   // check if password is correct
-  checkIfPasswordIsCorrect(res, existingUser.passwordHash, password);
+  checkIfPasswordIsCorrect(existingUser.passwordHash, password);
 
   // generate access refresh token
   const accessToken = generateAccessToken(existingUser._id);
   const refreshToken = generateRefreshToken(existingUser._id);
 
   // update refresh token in user
-  const updatedUser = await updateRefreshTokenOfUser(res, existingUser._id, refreshToken);
+  const updatedUser = await updateRefreshTokenOfUser(existingUser._id, refreshToken);
 
   // omit refresh token and passwordHash from user
   const newUser = omitPasswordHashAndRefreshToken(updatedUser);
@@ -109,20 +109,20 @@ export const logoutUser = asyncHandler(async (req, res) => {
   // send success response with clear cookies
 
   // validate request
-  validateRequest(res, req, true, true);
+  validateRequest(req, true, true);
 
   // validate request format
   const { refreshToken } = req.cookies;
-  if (!refreshToken) unauthorized(res, "User credentials are not authorised for the task requested.");
+  if (!refreshToken) unauthorized("User credentials are not authorised for the task requested.");
 
   // check if user exists
-  const existingUser = checkIfUserExists(res, username, email);
+  const existingUser = checkIfUserExists(username, email);
 
   // check if refresh token is correct
-  validateRefreshToken(res, refreshToken);
+  validateRefreshToken(refreshToken);
 
   // log user out by invalidating refresh token stored
-  updateRefreshTokenOfUser(res, existingUser._id, _, true);
+  updateRefreshTokenOfUser(existingUser._id, _, true);
 
   // send response back
   successResponseWithClearCookie(res, {}, "User logged out successfully.");
@@ -139,7 +139,7 @@ export const refreshUser = asyncHandler(async (req, res) => {
   validateRequest(req, false, true, false, true);
 
   // check if refresh token is correct
-  const user = validateRefreshToken(res, refreshToken);
+  const user = validateRefreshToken(refreshToken);
 
   // generate access token
   const accessToken = generateAccessToken(user._id);
