@@ -1,5 +1,8 @@
-import { Router } from "express";
-import { signUp } from "../controllers/auth.controller";
+import { Router } from 'express';
+import { errorResponse, successResponse } from '../helpers/ApiResponse.js';
+import Constants from '../constants.js';
+import { loginUser, logoutUser, registerUser } from '../controllers/auth.controller.js';
+import authenticate from '../middlewares/auth.middleware.js';
 
 const publicRouter = Router();
 publicRouter.get("/", (req, res) => {
@@ -25,6 +28,11 @@ publicRouter.get("/health", (req, res) => {
   }
 });
 
-publicRouter.post("/signup", signUp);
+publicRouter.post(`/api/register`, registerUser);
+publicRouter.post(`/api/login`, loginUser);
 
-export { publicRouter };
+const protectedRouter = Router();
+protectedRouter.use(authenticate);
+protectedRouter.post(`/api/logout`, logoutUser);
+
+export { publicRouter, protectedRouter };

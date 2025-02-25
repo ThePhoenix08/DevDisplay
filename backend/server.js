@@ -5,8 +5,8 @@ import express from 'express';
 
 import connectToDatabase from './database/connectToDatabase.js';
 import CONSTANTS from './constants.js';
-import { publicRouter } from './routes/routes.js';
 import { requestLogger } from './helpers/logging.js';
+import { protectedRouter, publicRouter } from './routes/routes.js';
 
 connectToDatabase();
 const PORT = CONSTANTS.PORT;
@@ -20,6 +20,7 @@ const middlewares = [
   compression(),
   requestLoggerMiddleware,
   publicRouter,
+  protectedRouter,
 ];
 app.use(middlewares);
 

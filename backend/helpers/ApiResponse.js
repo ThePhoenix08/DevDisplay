@@ -46,7 +46,6 @@ const successResponseWithCookies = (res, data, message, cookies) => {
   }
 }
 
-
 /** successResponseWithClearCookie(res, data, message) => void */
 const successResponseWithClearCookie = (res, data, message) => {
   const options = { httpOnly: true, secure: true, sameSite: "strict" };
