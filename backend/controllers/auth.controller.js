@@ -139,8 +139,12 @@ export const refreshUser = asyncHandler(async (req, res) => {
   // validate request
   validateRequest(req, false, true, false, true);
 
+  // validate request format
+  const { refreshToken } = req.cookies;
+  if (!refreshToken) unauthorized("User credentials are not authorised for the task requested.");
+
   // check if refresh token is correct
-  const user = validateRefreshToken(refreshToken);
+  const user = await validateRefreshToken(refreshToken);
 
   // generate access token
   const accessToken = generateAccessToken(user._id);

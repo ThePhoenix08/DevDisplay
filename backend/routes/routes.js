@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { loginUser, logoutUser, registerUser } from '../controllers/auth.controller.js';
+import { loginUser, logoutUser, refreshUser, registerUser } from '../controllers/auth.controller.js';
 import authenticate from '../middlewares/auth.middleware.js';
 
 const publicRouter = Router();
@@ -32,5 +32,6 @@ publicRouter.post(`/api/login`, loginUser);
 const protectedRouter = Router();
 protectedRouter.use(authenticate);
 protectedRouter.post(`/logout`, logoutUser);
+protectedRouter.post(`/refresh`, refreshUser);
 
 export { publicRouter, protectedRouter };
