@@ -1,9 +1,9 @@
 import { validate, validateRequest } from "../services/common.service.js";
-import asyncHandler from "../helpers/AsyncHandler.js";
+import asyncHandler from "../helpers/asyncHandler.js";
 import { checkIfPasswordIsCorrect, checkIfUserExists, generateAccessToken, generateRefreshToken, hashUserPassword, omitPasswordHashAndRefreshToken, updateRefreshTokenOfUser, validateRefreshToken } from "../services/auth.service.js";
 import { conflict, internalServerError, unauthorized } from "../helpers/ApiError.js";
 import { loginSchema, signUpSchema } from "../validators/auth.validator.js";
-import UserModel from "../database/models/User.model.js";
+import UserModel from "../database/models/user.model.js";
 import { successResponseWithClearCookie, successResponseWithCookies } from "../helpers/ApiResponse.js";
 
 export const registerUser = asyncHandler(async (req, res) => {

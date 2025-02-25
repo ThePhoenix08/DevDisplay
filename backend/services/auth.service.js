@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 import Constants from '../constants.js';
-import User from '../database/models/User.model.js';
+import User from '../database/models/user.model.js';
 import { notFound, unauthorized, internalServerError, badRequest } from '../helpers/ApiError.js';
 
 /* services for auth */

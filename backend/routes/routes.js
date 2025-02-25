@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import { errorResponse, successResponse } from '../helpers/ApiResponse.js';
-import Constants from '../constants.js';
 import { loginUser, logoutUser, registerUser } from '../controllers/auth.controller.js';
 import authenticate from '../middlewares/auth.middleware.js';
 

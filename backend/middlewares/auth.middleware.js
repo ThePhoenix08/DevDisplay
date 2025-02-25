@@ -1,9 +1,9 @@
-import asyncHandler from "../helpers/AsyncHandler";
-import { validateRequest } from "../services/common.service";
-import UserModel from "../database/models/User.model";
-import { unauthorized, internalServerError, badRequest } from "../helpers/ApiError";
+import asyncHandler from "../helpers/asyncHandler.js";
+import { validateRequest } from "../services/common.service.js";
+import UserModel from "../database/models/user.model.js";
+import { unauthorized, internalServerError, badRequest } from "../helpers/ApiError.js";
 
-const authenticate = asyncHandler(async(req, res, next) => {
+const authenticate = asyncHandler(async(req, _res, next) => {
   // steps
   // validate req format
   // extract access token from req cookies
@@ -22,26 +22,26 @@ const authenticate = asyncHandler(async(req, res, next) => {
   const decoded = jwt.verify(accessToken, Constants.ACCESS_TOKEN_SECRET);
   if(!decoded) {
     console.log("ACCESS_TOKEN_ERROR: Undefined");
-    unauthorized(res, 'Access token is invalid or has expired');
+    unauthorized('Access token is invalid or has expired');
   }
 
   // validate access token format
   const { iss: issuer, sub: userId, iat: issuedAt, purpose } = decoded;
   if(!userId || !issuedAt || !purpose) {
     console.log("ACCESS_TOKEN_ERROR: Wrong format");
-    badRequest(res, 'Access token is invalid or has expired');
+    badRequest('Access token is invalid or has expired');
   }
 
   // check if access token is issued by the correct origin
   if(issuer !== Constants.ORIGIN_URL) {
     console.log("ACCESS_TOKEN_ERROR: Origin mismatch");
-    unauthorized(res, 'Access token is invalid or has expired');
+    unauthorized('Access token is invalid or has expired');
   }
 
   // check if access token has expired
   if(issuedAt + Constants.ACCESS_TOKEN_MAXAGE < Date.now()) {
     console.log("ACCESS_TOKEN_ERROR: Expired");
-    unauthorized(res, 'Refresh token is invalid or has expired');
+    unauthorized('Refresh token is invalid or has expired');
   }
 
   // check if user id is valid
@@ -49,7 +49,7 @@ const authenticate = asyncHandler(async(req, res, next) => {
     const user = await UserModel.findById(userId).lean();
     if (!user) throw notFound('User not found');
   } catch (error) {
-    internalServerError(res, 'Failed to check if user exists');
+    internalServerError('Failed to check if user exists');
   }
 
   // attach user to request

@@ -8,6 +8,12 @@ import CONSTANTS from './constants.js';
 import { requestLogger } from './helpers/logging.js';
 import { protectedRouter, publicRouter } from './routes/routes.js';
 
+// request logger middleware
+const requestLoggerMiddleware = (req, _res, next) => {
+  requestLogger(req);
+  next();
+};
+
 connectToDatabase();
 const PORT = CONSTANTS.PORT;
 
@@ -34,9 +40,3 @@ process.on('unhandledRejection', (reason, promise) => {
   console.log("⚠️ Unhandled Rejection at:\n", promise, "reason:\n", reason);
   process.exit(1);
 });
-
-// request logger middleware
-const requestLoggerMiddleware = (req, _res, next) => {
-  requestLogger(req);
-  next();
-};
