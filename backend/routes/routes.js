@@ -31,6 +31,6 @@ publicRouter.post(`/api/login`, loginUser);
 
 const protectedRouter = Router();
 protectedRouter.use(authenticate);
-protectedRouter.post(`/api/logout`, logoutUser);
+protectedRouter.post(`/logout`, logoutUser);
 
 export { publicRouter, protectedRouter };

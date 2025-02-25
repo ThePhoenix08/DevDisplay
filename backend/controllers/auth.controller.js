@@ -113,20 +113,17 @@ export const logoutUser = asyncHandler(async (req, res) => {
   // send success response with clear cookies
 
   // validate request
-  validateRequest(req, true, true);
+  validateRequest(req, false, true, false, true);
 
   // validate request format
   const { refreshToken } = req.cookies;
   if (!refreshToken) unauthorized("User credentials are not authorised for the task requested.");
 
-  // check if user exists
-  const existingUser = checkIfUserExists(username, email);
-
-  // check if refresh token is correct
-  validateRefreshToken(refreshToken);
+  // check if user exists using refresh token, thus validating refresh token
+  const existingUser = await validateRefreshToken(refreshToken);
 
   // log user out by invalidating refresh token stored
-  updateRefreshTokenOfUser(existingUser._id, _, true);
+  await updateRefreshTokenOfUser(existingUser._id, null, true);
 
   // send response back
   successResponseWithClearCookie(res, {}, "User logged out successfully.");

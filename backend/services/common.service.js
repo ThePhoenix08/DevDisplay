@@ -19,8 +19,8 @@ const validateRequest = async (req, needsBody = true, protectedRoute = false, qu
   if(needsBody && (!req.body || Object.keys(req.body).length === 0)) {
     badRequest('Request body is missing or empty');
   }
-  if(protectedRoute && (!req.headers || !req.headers.authorization)) {
-    unauthorized('Authorization header is missing or empty');
+  if(protectedRoute && (!req.cookies || !req.cookies.accessToken)) {
+    unauthorized('Access token is missing or empty');
   }
   if(refreshRequest && (!req.cookies || !req.cookies.refreshToken)) {
     unauthorized('Refresh token is missing or empty');

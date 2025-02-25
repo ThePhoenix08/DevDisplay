@@ -26,9 +26,10 @@ const middlewares = [
   compression(),
   requestLoggerMiddleware,
   publicRouter,
-  // protectedRouter,
 ];
 app.use(middlewares);
+
+app.use("/api/auth", protectedRouter);
 
 app.listen(PORT, () => {
   const msg = Constants.ENV === 'production' ? 'in production' : `in development on port: ${PORT}`;

@@ -2,6 +2,8 @@ import asyncHandler from "../helpers/asyncHandler.js";
 import { validateRequest } from "../services/common.service.js";
 import UserModel from "../database/models/user.model.js";
 import { unauthorized, internalServerError, badRequest } from "../helpers/ApiError.js";
+import jwt from 'jsonwebtoken';
+import Constants from "../constants.js";
 
 const authenticate = asyncHandler(async(req, _res, next) => {
   // steps
@@ -13,7 +15,7 @@ const authenticate = asyncHandler(async(req, _res, next) => {
   // access token has not expired
 
   // validate request
-  validateRequest(req);
+  validateRequest(req, false, true, false, true);
 
   // extract access token
   const { accessToken } = req.cookies;
@@ -45,8 +47,9 @@ const authenticate = asyncHandler(async(req, _res, next) => {
   }
 
   // check if user id is valid
+  let user;
   try {
-    const user = await UserModel.findById(userId).lean();
+    user = await UserModel.findById(userId).lean();
     if (!user) throw notFound('User not found');
   } catch (error) {
     internalServerError('Failed to check if user exists');
