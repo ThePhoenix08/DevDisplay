@@ -81,7 +81,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const { username, email, password } = data;
 
   // check if user exists
-  const existingUser = checkIfUserExists(username, email);
+  const existingUser = await checkIfUserExists(username, email);
 
   // check if password is correct
   checkIfPasswordIsCorrect(existingUser.passwordHash, password);
@@ -97,7 +97,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const newUser = omitPasswordHashAndRefreshToken(updatedUser);
 
   // send success response with newUser and cookies
-  successResponseWithCookies(res, { user: newUser }, "User registered successfully.", {
+  successResponseWithCookies(res, { user: newUser }, "User logged in successfully.", {
     accessToken,
     refreshToken
   });

@@ -43,7 +43,7 @@ const checkIfPasswordIsCorrect = async (storedPasswordHash, passwordToVerify, th
     }
     return true;
   } catch (error) {
-    internalServerError('Failed to check if password is correct');
+    internalServerError('Failed to check if password is correct: ' + error.message, error);
   }
 }
 
